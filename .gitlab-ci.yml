@@ -1,0 +1,68 @@
+include:
+  - project: mishaga-cfg/ci-templates
+    file: templates.yaml
+
+
+variables:
+  DOCKER_IMAGE: project_name
+  DOCKER_LOCAL_IMAGE: project_name_api
+  APP_NAME: api
+
+
+stages:
+  - checks
+  - release
+  - deploy
+
+
+# CI/CD pipeline
+tests:
+  stage: checks
+  extends:
+    - .mr-or-default-branch
+    - .pytest-tests
+
+
+lint:
+  stage: checks
+  extends:
+    - .mr-or-default-branch
+    - .flake8-lint
+
+
+migrations:
+  stage: checks
+  extends:
+    - .mr-or-default-branch
+    - .alembic-migrations-check
+
+
+semantic release:
+  stage: release
+  extends:
+    - .default-branch
+    - .semantic-release
+
+
+push image:
+  stage: release
+  extends:
+    - .default-branch
+    - .build-and-push
+  needs:
+    - semantic release
+
+
+deploy prod:
+  stage: deploy
+  extends:
+    - .default-branch
+    - .k8s-deploy
+  variables:
+    HELM_CHART_NAME: web
+    NAMESPACE: project-ns
+    SERVICE_NAME: back
+    SET: "applications.api.image.tag=${VERSION}"
+  needs:
+    - push image
+    - semantic release

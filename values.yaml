@@ -1,0 +1,47 @@
+serviceName: project_name
+applications:
+  api:
+    replicas: 1
+    image:
+      name: hub.mishaga.com/project_name
+      tag: unknown  # this value will be replaced in deploy step in CI/CD
+
+    command:
+      - bash
+      - -c
+      - export $(cat /vault/secrets/project_name | xargs) &&
+        alembic upgrade head &&
+        uvicorn api.app:app --host=0.0.0.0 --port=80 --workers=2 --no-server-header
+
+    env:
+      - name: "DEBUG"
+        value: "false"
+      - name: "PYTHONUNBUFFERED"
+        value: "1"
+
+    injectVault: true
+
+    service:
+      enabled: true
+      port: 80
+
+    ingress:
+      enabled: true
+      httpsEnabled: true
+      host: project.domain.com
+
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 7
+      failureThreshold: 3
+
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 20
+      failureThreshold: 9

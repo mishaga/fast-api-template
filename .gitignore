@@ -1,0 +1,9 @@
+/.idea
+/.pg-data
+/.mq-data
+/.mypy_cache
+/.pytest_cache
+/docker-compose.override.yaml
+__pycache__
+/.env
+/.python-version

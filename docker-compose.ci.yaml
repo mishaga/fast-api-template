@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+
+  api:
+    build:
+      context: .
+      target: test
+    environment:
+      - DEBUG=true
+      - ENVIRONMENT=ci-tests
+
+      - SENTRY_DSN=
+      - JWT_SECRET=...secret...
+
+      - POSTGRES_HOST=test-db
+      - POSTGRES_DATABASE=database_tests
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=...postgres...
+
+  database-server:
+    image: postgres:16-alpine
+    container_name: test-db
+    environment:
+      - POSTGRES_DB=database_tests
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=...postgres...
+      - TZ=Europe/London

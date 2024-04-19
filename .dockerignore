@@ -1,0 +1,12 @@
+/.git
+/.gitignore
+/.gitlab-ci.yml
+/.releaserc.json
+/docker-compose.ci.yaml
+/docker-compose.local.yaml
+/Dockerfile
+/Makefile
+/README.md
+/values.yaml
+__pycache__
+.DS_Store
